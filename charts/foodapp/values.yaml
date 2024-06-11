@@ -1,0 +1,60 @@
+replicaCount: 1
+
+ingress:
+  host: foodapp.k8s.com
+  paths:
+    springbootapp: /api
+    reactapp: /
+
+secret:
+  type: Opaque
+  data: 
+    ROOT_PASSWORD: a2llbnRyYW4=
+    USER_PASSWORD: a2llbnRyYW4=
+
+configmap:
+  data: 
+    MYSQL_USER: kientran
+    MYSQL_DATABASE: foodapp
+
+mysql:
+  persistentVolume:
+    capacity:
+      storage: 1Gi
+    accessModes: ReadWriteOnce
+    hostPath:
+      path: /data/mysql
+  persistentVolumeClaim:
+    accessModes: ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+  deployment:
+    images: mysql:8.0.32
+    ports:
+      containerPort: 3306
+    volumeMounts:
+      mountPath: /var/lib/mysql
+  service:
+    ports:
+      port: 3306
+
+springbootapp:
+  deployment:
+    image: kien2402/spring-boot-app
+    ports:
+      containerPort: 8080
+  service:
+    ports:
+      port: 8080
+      targetPort: 8080
+
+reactapp:
+  deployment:
+    image: kien2402/react-app
+    ports:
+      containerPort: 3000
+  service:
+    ports:
+      port: 3000
+      targetPort: 3000
